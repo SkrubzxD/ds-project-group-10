@@ -15,10 +15,7 @@ worker slots=2
 4. copy all files to worker to the same path
 
 5. run on master
-mpirun -np 4 \
-    --hostfile mpi_hosts \
-    --mca btl_tcp_if_include <subnet> \
-    python3 -u server.py
+mpirun -np 4 --hostfile mpi_hosts python3 server.py
     
 6. run on peer
 python3 client.py <rank>

@@ -43,7 +43,8 @@ def handle_server(comm, size):
 
                 # Broadcast updated directory to all peers
                 for r in range(1, size):
-                    comm.send(user_directory, dest=r, tag=TAG_DIR_UPDATE)
+                    comm.isend(user_directory, dest=r, tag=TAG_DIR_UPDATE)
+                print(f"[Server-0] Broadcasted updated user directory", flush=True)
 
         time.sleep(0.01)
 
