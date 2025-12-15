@@ -1,0 +1,67 @@
+# setup
+1.
+master@<ip-master>
+worker@<ip-worker>
+
+2. set up passwordless ssh
+From master:
+ssh-keygen -t ed25519
+ssh-copy-id worker@<ip-worker>
+
+3. create file "mpi_hosts"
+master slots=2
+worker slots=2
+
+4. copy all files to worker to the same path
+
+5. run on master
+mpirun -np 4 \
+    --hostfile mpi_hosts \
+    --mca btl_tcp_if_include <subnet> \
+    python3 -u server.py
+    
+6. run on peer
+python3 client.py <rank>
+
+7. fix
+- ssh
+(edit /etc/hosts and ~/.ssh/config if needed)
+
+- OpenMPI, Unable to find reachable pairing between local and remote interfaces
+(use --mca btl_tcp_if_include <interface>)
+(disable ipv6)
+
+- REBOOT !!!
+
+# example
+- run 4 processes, 2 on master and 2 on worker
+- 3 peers
+
+0. setup
+master node: kali@192.168.2.1
+worker node: minhbd@192.168.2.2
+
+1. copy file so same path in master and worker, here we use /tmp
+
+┌──(kali㉿kali)-[~/ds26]
+└─$ cp fserver.py fclient.py mpi_hosts /tmp 
+
+┌──(kali㉿kali)-[~/ds26]
+└─$ scp -r /tmp/fclient.py /tmp/fserver.py /tmp/mpi_hosts minhbd@minhbd:/tmp
+
+┌──(kali㉿kali)-[/tmp]
+└─$ cat mpi_hosts
+127.0.0.1 slots=2
+minhbd slots=2
+
+2. run on kali
+mpirun -np 4 \
+    --hostfile mpi_hosts \
+    --mca btl_tcp_if_include 192.168.2.0/24 \
+    python3 fserver.py
+
+3. run on peer
+python3 fclient.py
+
+peer-1: kali
+peer-2, peer-3: minhbd

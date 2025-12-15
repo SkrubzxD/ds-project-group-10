@@ -92,8 +92,10 @@ def handle_client(comm, rank):
                     username = msg_str
                     comm.send(username, dest=0, tag=TAG_REGISTER)
                     os.write(pipe_out_fd, f"[System] Registered as '{username}'.\n".encode())
-                    os.write(pipe_out_fd, b"[System] Usage: /<username> <msg> OR /all <msg>\n")
-
+                    os.write(pipe_out_fd, b"[System] Usage: /<username> <msg>; /all <msg>; /ls\n")
+                # List user and rank
+                elif msg_str == "/ls":
+                    os.write(pipe_out_fd, f"User online: {user_directory}\n".encode())
                 # Send message
                 elif msg_str.startswith("/"):
                     parts = msg_str[1:].split(" ", 1)
@@ -113,6 +115,7 @@ def handle_client(comm, rank):
                         os.write(pipe_out_fd, f"[Error] User '{dest}' not found.\n".encode())
                 else:
                     os.write(pipe_out_fd, b"[Error] Invalid format. Use /<user> <msg>\n")
+
 
             except OSError:
                 break
